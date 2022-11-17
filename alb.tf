@@ -1,6 +1,6 @@
 # Creating External LoadBalancer
 resource "aws_lb" "external" {
-  name                       = "ayerhvpc external alb"
+  name                       = "ayerhvpc-external-alb"
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.web_tier.id]
@@ -9,7 +9,7 @@ resource "aws_lb" "external" {
 }
 
 resource "aws_lb_target_group" "web_tier" {
-  name     = "my web tier target group"
+  name     = "my-web-tier-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.ayerhvpc.id
@@ -42,7 +42,7 @@ resource "aws_lb_listener" "listener1" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.target_elb.arn
+    target_group_arn = aws_lb_target_group.web_tier.arn
   }
 }
 
@@ -91,7 +91,7 @@ resource "aws_autoscaling_attachment" "web_tier" {
 
 # Creating External LoadBalancer
 resource "aws_lb" "internal" {
-  name                       = "ayerhvpc internal alb"
+  name                       = "ayerhvpc-internal-alb"
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.app_tier.id]
@@ -100,7 +100,7 @@ resource "aws_lb" "internal" {
 }
 
 resource "aws_lb_target_group" "app_tier" {
-  name     = "my app tier target group"
+  name     = "my-app-tier-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.ayerhvpc.id
@@ -159,7 +159,7 @@ resource "aws_autoscaling_group" "app_tier" {
   }
 }
   
-  
+
 #Creating launch template for App Tier Auto Scaling Group
 resource "aws_launch_template" "app_tier" {
   name_prefix   = "app_tier_launch_template"

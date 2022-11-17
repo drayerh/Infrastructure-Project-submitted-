@@ -19,12 +19,12 @@ resource "aws_security_group" "web_tier" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # SSH access from my ip address
+  # SSH access from internet
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.my_ip]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Outbound Rules

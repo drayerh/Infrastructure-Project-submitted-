@@ -7,6 +7,6 @@ output "lb_dns_name" {
 #Getting the database connection string
 output "db_connect_string" {
   description = "MySQL database connection string"
-  value       = "Server=${aws_db_instance.default.address}; Database=mydb; Uid=${var.db_username}; Pwd=${var.db_password}"
+  value       = "Server=${aws_db_instance.mysql.address}; Database=mydb; Uid=${var.db_username}; Pwd=${var.db_password}"
   sensitive   = true
 }
