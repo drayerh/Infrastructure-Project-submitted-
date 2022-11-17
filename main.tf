@@ -118,18 +118,53 @@ resource "aws_route_table_association" "public2" {
 # uses nat gateway in az-a (public subnet 1)
 resource "aws_route_table" "private_az_a" {
   vpc_id = aws_vpc.ayerhvpc.id
+  
+route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.pub_sub_1.id
+  }
+
+  tags = {
+    Name = var.tags[0]
+  }
+
   depends_on = [
     aws_nat_gateway.pub_sub_1
   ]
 }
 
 # Creating Private Route table for app and db subnets in az-b
-# uses nat gateway in az-b (public subnet 2)
+# uses nat gat in az-b (public subnet 2)
 resource "aws_route_table" "private_az_b" {
   vpc_id = aws_vpc.ayerhvpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.pub_sub_2.id
+  }
+
+  tags = {
+    Name = var.tags[0]
+  }
   depends_on = [
     aws_nat_gateway.pub_sub_2
   ]
+}
+
+resource "aws_route_table" "data_az_a" {
+  vpc_id = aws_vpc.ayerhvpc.id
+
+  tags = {
+    Name = var.tags[0]
+  }
+}
+
+resource "aws_route_table" "data_az_b" {
+  vpc_id = aws_vpc.ayerhvpc.id
+
+  tags = {
+    Name = var.tags[0]
+  }
 }
 
 # Associating AZ-1 Private Subnet 1 with Private az-a Route Table 
@@ -139,7 +174,7 @@ resource "aws_route_table_association" "private_az_a" {
 }
 
 # Associating AZ-1 Private Subnet 3 with Private az-a Route Table 
-resource "aws_route_table_association" "private_az_a" {
+resource "aws_route_table_association" "data_az_a" {
   subnet_id      = aws_subnet.private_subnet_3.id
   route_table_id = aws_route_table.private_az_a.id
 }
@@ -151,7 +186,7 @@ resource "aws_route_table_association" "private_az_b" {
 }
 
 # Associating AZ-2 Private Subnet 4  with Private az-b Table
-resource "aws_route_table_association" "private_az_b" {
+resource "aws_route_table_association" "data_az_b" {
   subnet_id      = aws_subnet.private_subnet_4.id
   route_table_id = aws_route_table.private_az_b.id
 }
