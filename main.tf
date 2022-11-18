@@ -68,7 +68,7 @@ resource "aws_subnet" "private_subnet_3" {
   vpc_id                  = aws_vpc.ayerhvpc.id
   cidr_block              = var.priv_subnet3_cidr
   map_public_ip_on_launch = false
-  availability_zone       = "eu-west-2b"
+  availability_zone       = "eu-west-2a"
 
   tags = {
     Name = var.tags[0]
@@ -118,8 +118,8 @@ resource "aws_route_table_association" "public2" {
 # uses nat gateway in az-a (public subnet 1)
 resource "aws_route_table" "private_az_a" {
   vpc_id = aws_vpc.ayerhvpc.id
-  
-route {
+
+  route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.pub_sub_1.id
   }
@@ -226,16 +226,3 @@ resource "aws_nat_gateway" "pub_sub_2" {
 }
 
 # associating private route tables with NAT Gateways
-#1st nat association
-resource "aws_route" "nat_association1" {
-  route_table_id         = aws_route_table.private_az_a.id
-  nat_gateway_id         = aws_nat_gateway.pub_sub_1.id
-  destination_cidr_block = "0.0.0.0/0"
-}
-
-#2nd nat association
-resource "aws_route" "nat_association2" {
-  route_table_id         = aws_route_table.private_az_b.id
-  nat_gateway_id         = aws_nat_gateway.pub_sub_2.id
-  destination_cidr_block = "0.0.0.0/0"
-}

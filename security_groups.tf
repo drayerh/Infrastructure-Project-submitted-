@@ -50,29 +50,29 @@ resource "aws_security_group" "app_tier" {
   # Inbound Rules
   # HTTP access from web tier
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-   security_groups  = [aws_security_group.web_tier.id]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.web_tier.id]
   }
 
   # HTTPS access from web tier 
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "https"
-    security_groups  = [aws_security_group.web_tier.id]
+    from_port       = 443
+    to_port         = 443
+    protocol        = "https"
+    security_groups = [aws_security_group.web_tier.id]
   }
 
   # SSH access from web tier
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    security_groups  = [aws_security_group.web_tier.id] 
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.web_tier.id]
   }
   # MY SQL traffic from web tier
-   ingress {
+  ingress {
     description     = "Allow traffic from web tier"
     from_port       = 3306
     to_port         = 3306
@@ -83,10 +83,10 @@ resource "aws_security_group" "app_tier" {
   # Outbound Rules
   # All traffic to web tier
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    security_groups  = [aws_security_group.web_tier.id]
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = [aws_security_group.web_tier.id]
   }
 
   tags = {
@@ -102,7 +102,7 @@ resource "aws_security_group" "database-sg" {
   description = "Allow inbound traffic from app tier"
   vpc_id      = aws_vpc.ayerhvpc.id
 
-# Inbound
+  # Inbound
   ingress {
     description     = "Allow SQL from app tier"
     from_port       = 3306
@@ -110,11 +110,11 @@ resource "aws_security_group" "database-sg" {
     protocol        = "tcp"
     security_groups = [aws_security_group.app_tier.id]
   }
-# Outbound
+  # Outbound
   egress {
-    from_port   = 32768
-    to_port     = 65535
-    protocol    = "tcp"
+    from_port       = 32768
+    to_port         = 65535
+    protocol        = "tcp"
     security_groups = [aws_security_group.app_tier.id]
   }
 
