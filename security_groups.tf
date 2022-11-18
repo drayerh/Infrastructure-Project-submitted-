@@ -55,14 +55,7 @@ resource "aws_security_group" "app_tier" {
     protocol        = "tcp"
     security_groups = [aws_security_group.web_tier.id]
   }
-
-  # HTTPS access from web tier 
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "https"
-    security_groups = [aws_security_group.web_tier.id]
-  }
+  
 
   # SSH access from web tier
   ingress {
