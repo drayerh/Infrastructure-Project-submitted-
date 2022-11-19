@@ -6,7 +6,7 @@ resource "aws_lb" "external" {
   subnets         = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
   
   listener {
-    instance_port     = 80
+    instance_port     = 8000
     instance_protocol = "http"
     lb_port           = 80
     lb_protocol       = "http"

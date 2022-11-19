@@ -4,29 +4,38 @@ resource "aws_security_group" "web_tier" {
   vpc_id = aws_vpc.ayerhvpc.id
 
   # Inbound Rules
-  # HTTP access from anywhere
+  # HTTP access from external load balancer
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.ext_lb.id]
   }
 
-  # HTTPS access from anywhere
+  # HTTPS access from external load balancer
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.ext_lb.id]
   }
 
-  # SSH access from internet
+  # SSH traffic from external load balancer
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    s = cidr_block[".0.00.0/0"]
+    security_groups = [aws_security_group.ext_lb.id]
   }
+
+  # allow http from external alb
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    security_groups = [aws_security_group.ext_lb.id]
+  }
+
 
   # Outbound Rules
   # Internet access to anywhere
@@ -56,8 +65,15 @@ resource "aws_security_group" "app_tier" {
     protocol        = "tcp"
     security_groups = [aws_security_group.web_tier.id]
   }
-  
 
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "https"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  
   # SSH access from web tier
   ingress {
     from_port       = 22
@@ -65,6 +81,7 @@ resource "aws_security_group" "app_tier" {
     protocol        = "tcp"
     security_groups = [aws_security_group.web_tier.id]
   }
+  
   # MY SQL traffic from web tier
   ingress {
     description     = "Allow traffic from web tier"
@@ -130,10 +147,18 @@ resource "aws_security_group" "ext_lb" {
   ingress {
     from_port       = 80
     to_port         = 80
-    protocol        = "tcp"
+    protocol        = "http"
     cidr_blocks = ["0.0.0.0/0"]
   }
   
+  # HTTPS access from anywhere
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "https"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
   # SSH access from web tier
   ingress {
@@ -168,7 +193,7 @@ resource "aws_security_group" "int_lb" {
   ingress {
     from_port       = 80
     to_port         = 80
-    protocol        = "tcp"
+    protocol        = "http"
     security_groups = [aws_security_group.web_tier.id]
   }
   
