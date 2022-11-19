@@ -53,6 +53,10 @@ variable "tags" {
   default     = ["prod", "test", "dev"]
 }
 
+
+
+#### Defining Variables for RDS Database
+
 #Making Database username sensitive
 variable "db_username" {
   description = "RDS administrator username"
@@ -60,11 +64,18 @@ variable "db_username" {
   sensitive   = true
 }
 
-#Making Database Password sensitive
+#Making Database password sensitive
 variable "db_password" {
   description = "RDS administrator password"
   type        = string
   sensitive   = true
+}
+
+#Making Database name a variable
+variable "mydb_name" {
+  description = "RDS database name"
+  type        = string
+  default  = "mysql-database-3tier"
 }
 
 #Making my ip address for SSH access sensitive
@@ -79,4 +90,47 @@ variable "aws_db_subnet_group_default" {
   description = "my default db subnet group"
   type        = string
   default     = "my subnet group"
+}
+
+
+
+
+
+#Defining variables and data for load balancer
+variable "lb_arn" {
+  type    = string
+  default = ""
+}
+
+variable "lb_name" {
+  type    = string
+  default = ""
+}
+
+data "aws_lb" "test" {
+  arn  = var.lb_arn
+  name = var.lb_name
+}
+
+
+
+
+#Defining variables and data for load balancer listener
+variable "listener_arn" {
+  type = string
+}
+
+data "aws_lb_listener" "listener" {
+  arn = var.listener_arn
+}
+
+# get listener from load_balancer_arn and port
+
+data "aws_lb" "selected" {
+  name = "default-public"
+}
+
+data "aws_lb_listener" "selected443" {
+  load_balancer_arn = data.aws_lb.selected.arn
+  port              = 443
 }
