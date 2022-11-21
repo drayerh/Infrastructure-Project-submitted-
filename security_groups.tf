@@ -19,22 +19,14 @@ resource "aws_security_group" "web_tier" {
     protocol    = "tcp"
     security_groups = [aws_security_group.ext_lb.id]
   }
-
-  # SSH traffic from external load balancer
+  # Allow SSH
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    security_groups = [aws_security_group.ext_lb.id]
+    cidr_blocks = "0.0.0.0/0"
   }
-
-  # allow http from external alb
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    security_groups = [aws_security_group.ext_lb.id]
-  }
+  
 
 
   # Outbound Rules
@@ -43,7 +35,7 @@ resource "aws_security_group" "web_tier" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [aws_security_group.ext_lb.id]
   }
 
   tags = {
@@ -58,46 +50,37 @@ resource "aws_security_group" "app_tier" {
   vpc_id = aws_vpc.ayerhvpc.id
 
   # Inbound Rules
-  # HTTP access from web tier
+  # HTTP access from internal load balancer
   ingress {
     from_port       = 80
     to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web_tier.id]
+    protocol        = "http"
+    security_groups = [aws_security_group.int_lb.id]
   }
-
+  # HTTPS access from internal load balancer
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "https"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.int_lb.id]
   }
 
-  
-  # SSH access from web tier
+  # SSH access 
   ingress {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.web_tier.id]
+    security_groups = ["0.0.0.0/0"]
   }
   
-  # MY SQL traffic from web tier
-  ingress {
-    description     = "Allow traffic from web tier"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web_tier.id]
-  }
-
+  
   # Outbound Rules
-  # All traffic to web tier
+  # All traffic to internal load security group
   egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.web_tier.id]
+    security_groups = [aws_security_group.int_lb.id]
   }
 
   tags = {
@@ -110,7 +93,7 @@ resource "aws_security_group" "app_tier" {
 # Security Group for Database Tier
 resource "aws_security_group" "database-sg" {
   name        = "Database SG"
-  description = "Allow inbound traffic from app tier"
+  description = "allow app tier to communicate with data tier"
   vpc_id      = aws_vpc.ayerhvpc.id
 
   # Inbound
@@ -158,23 +141,15 @@ resource "aws_security_group" "ext_lb" {
     protocol    = "https"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-
-  # SSH access from web tier
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web_tier.id]
-  }
+  
   
   # Outbound Rules
-  # All traffic from web tier
+  # All traffic to internet
   egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.web_tier.id]
+    security_groups = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -196,23 +171,21 @@ resource "aws_security_group" "int_lb" {
     protocol        = "http"
     security_groups = [aws_security_group.web_tier.id]
   }
-  
-
-  # SSH access from web tier security group
+  # HTTPS access from web tier security group
   ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "httpS"
     security_groups = [aws_security_group.web_tier.id]
   }
   
   # Outbound Rules
-  # All traffic from web tier
+  # All traffic to web tier security group
   egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.app_tier.id]
+    security_groups = [aws_security_group.web_tier.id]
   }
 
   tags = {
