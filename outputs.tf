@@ -1,7 +1,7 @@
 # Getting the DNS of load balancer
 output "lb_dns_name" {
   description = "The DNS name of the load balancer"
-  value       = aws_elb.external.dns_name
+  value       = aws_lb.external.dns_name
 }
 
 #Getting the database connection string

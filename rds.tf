@@ -11,14 +11,13 @@ resource "aws_db_subnet_group" "default" {
 resource "aws_db_instance" "mysql" {
   allocated_storage      = 10
   db_subnet_group_name   = var.aws_db_subnet_group_default
-  engine                 = "mysql"
-  engine_version         = "8.0.28"
-  instance_class         = "db.t2.micro"
+  engine                 = var.my_engine
+  engine_version         = var.my_engine_version
+  instance_class         = var.instance_class
   multi_az               = true
-  db_name                = var.mydb_name
   username               = var.db_username
   password               = var.db_password
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.database-sg.id]
   publicly_accessible    = false
-  }
+}

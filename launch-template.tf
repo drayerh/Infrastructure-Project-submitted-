@@ -1,60 +1,53 @@
 #creating launch template for web tier  instances
 resource "aws_launch_template" "web" {
   name = var.web_launch_template_name
-
+  /*
   cpu_options {
-    core_count       = 1
-    threads_per_core = 2
-  }
+    core_count       = var.web_cpu_cc
+    threads_per_core = var.web_cpu_tpc
+  }*/
 
-  disable_api_stop        = true
-  disable_api_termination = true
+  image_id = var.instance_ami
 
-  iam_instance_profile {
-    name = var.iamprofile #drayerh1
-  }
-
-  image_id = var.instance_ami #"ami-0648ea225c13e0729"
-
-  instance_initiated_shutdown_behavior = "stop"
+  /*instance_initiated_shutdown_behavior = var.init_shutdown_behaviour*/
 
   instance_market_options {
-    market_type = var.instance_market_type #"spot"
+    market_type = var.instance_market_type
   }
 
-  instance_type = var.instancetype #t2.micro
+  instance_type = var.instance_type
 
-  kernel_id = "5.10"
-
-  key_name = var.my_instance_keypair #my-ec2key-cr
-
+  key_name = var.my_instance_keypair
+  /*
     metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "optional"
     http_put_response_hop_limit = 1
     instance_metadata_tags      = "enabled"
   }
+  */
 
   monitoring {
-    enabled = true
+    enabled = var.monitoring
   }
 
   network_interfaces {
-    associate_public_ip_address = true
+    associate_public_ip_address = var.assoc_public_ip
+    security_groups             = [aws_security_group.web_tier.id]
   }
 
-  vpc_security_group_ids = [aws_security_group.web_tier.id]
-
   tag_specifications {
-    resource_type = "instance"
+    resource_type = var.tag_spec_res_type
 
     tags = {
       Name = var.tags[0]
     }
   }
 
-  user_data = filebase64(IyEvYmluL2Jhc2gKCnl1bSB1cGRhdGUgLXkKeXVtIGluc3RhbGwgLXkgaHR0cGQueDg2XzY0CnN5c3RlbWN0bCBzdGFydCBodHRwZC5zZXJ2aWNlCnN5c3RlbWN0bCBlbmFibGUgaHR0cGQuc2VydmljZQplY2hvICJIZWxsbyBXb3JsZCBmcm9tICQoaG9zdG5hbWUgLWYpIiA+IC92YXIvd3d3L2h0bWwvaW5kZXguaHRtbA)
+  user_data = filebase64("${"install_apache.sh"}")
 }
+
+
 
 
 
@@ -63,60 +56,53 @@ resource "aws_launch_template" "web" {
 #creating launch template for app tier  instances
 resource "aws_launch_template" "app" {
   name = var.app_launch_template_name
-
+  /*
   cpu_options {
-    core_count       = 1
-    threads_per_core = 2
-  }
+    core_count       = var.app_cpu_cc
+    threads_per_core = var.app_cpu_tpc
+  }*/
 
-  disable_api_stop        = true
-  disable_api_termination = true
+  image_id = var.instance_ami
 
-  iam_instance_profile {
-    name = var.iamprofile #drayerh1
-  }
-
-  image_id = var.instance_ami #"ami-0648ea225c13e0729"
-
-  instance_initiated_shutdown_behavior = "stop"
-
+  /*instance_initiated_shutdown_behavior = var.init_shutdown_behaviour
+*/
   instance_market_options {
-    market_type = var.instance_market_type #"spot"
+    market_type = var.instance_market_type
   }
 
-  instance_type = var.instancetype
-
-  kernel_id = "5.10"
+  instance_type = var.instance_type
 
   key_name = var.my_instance_keypair
-
+  /*
     metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "optional"
     http_put_response_hop_limit = 1
     instance_metadata_tags      = "enabled"
   }
+  */
 
   monitoring {
-    enabled = true
+    enabled = var.monitoring
   }
 
   network_interfaces {
-    associate_public_ip_address = false
+    associate_public_ip_address = var.assoc_public_ip
+    security_groups             = [aws_security_group.app_tier.id]
   }
 
-  vpc_security_group_ids = [aws_security_group.app_tier.id]
-
   tag_specifications {
-    resource_type = "instance"
+    resource_type = var.tag_spec_res_type
 
     tags = {
       Name = var.tags[0]
     }
   }
 
-  user_data = filebase64(IyEvYmluL2Jhc2gKCnl1bSB1cGRhdGUgLXkKeXVtIGluc3RhbGwgLXkgaHR0cGQueDg2XzY0CnN5c3RlbWN0bCBzdGFydCBodHRwZC5zZXJ2aWNlCnN5c3RlbWN0bCBlbmFibGUgaHR0cGQuc2VydmljZQplY2hvICJIZWxsbyBXb3JsZCBmcm9tICQoaG9zdG5hbWUgLWYpIiA+IC92YXIvd3d3L2h0bWwvaW5kZXguaHRtbA)
+  user_data = filebase64("${"install_apache.sh"}")
 }
+
+
 
 
 

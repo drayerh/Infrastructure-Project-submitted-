@@ -53,10 +53,221 @@ variable "tags" {
   default     = ["prod", "test", "dev"]
 }
 
+#defining security group variables
+variable "ext_alb_sg" {
+  type    = string
+  default = "ext-alb-sg"
+}
+
+#defining web tier sg
+variable "web_tier_sg" {
+  type    = string
+  default = "web-tier-sg"
+}
+
+#defining int alb-sg
+variable "int_alb_sg" {
+  type    = string
+  default = "int-alb-sg"
+}
+#defining app tier sg
+variable "app_tier_sg" {
+  type    = string
+  default = "app-tier-sg"
+}
+#defining db tier sg
+variable "db_tier_sg" {
+  type    = string
+  default = "db-tier-sg"
+}
+
+#Defining variables for load balancers
+variable "lb_type" {
+  type    = list(string)
+  default = ["application", "network", "classic"]
+}
+variable "ext_lb_arn" {
+  type    = string
+  default = "aws_lb.eternal.id"
+}
+
+variable "ext_lb_name" {
+  type    = string
+  default = "ayerhvpc-external-lb"
+}
+
+variable "int_lb_arn" {
+  type    = string
+  default = "aws_lb.internal.id"
+}
+
+variable "int_lb_name" {
+  type    = string
+  default = "ayerhvpc-internal-lb"
+}
+
+#Defining variables for autoscaling security_groups
+#Web Tier ASG
+
+#web asg desired capacity
+variable "asg_web_dc" {
+  type    = number
+  default = 4
+}
+
+#web asg maximum size
+variable "asg_web_max" {
+  type    = number
+  default = 4
+}
+#web asg minimum size
+variable "asg_web_min" {
+  type    = number
+  default = 4
+}
 
 
-#### Defining Variables for RDS Database
+#App Tier ASG
 
+#app asg desired capacity
+variable "asg_app_dc" {
+  type    = number
+  default = 4
+}
+
+#web asg maximum size
+variable "asg_app_max" {
+  type    = number
+  default = 4
+}
+#web asg minimum size
+variable "asg_app_min" {
+  type    = number
+  default = 4
+}
+
+
+#Defining variables for launch templates 
+
+#launch template name
+variable "web_launch_template_name" {
+  type    = string
+  default = "aws_launch_template.web.id"
+}
+
+#launch template cpu options
+#core count
+variable "web_cpu_cc" {
+  type    = number
+  default = 1
+}
+#threads per core
+variable "web_cpu_tpc" {
+  type    = number
+  default = 2
+}
+
+#ami-id
+variable "instance_ami" {
+  type    = string
+  default = "ami-0648ea225c13e0729"
+}
+
+#instance_initiated_shutdown_behaviour
+variable "init_shutdown_behaviour" {
+  type    = string
+  default = "stop"
+}
+
+#instance_market_type
+variable "instance_market_type" {
+  type    = string
+  default = "spot"
+}
+
+#instance_type
+variable "instance_type" {
+  type    = string
+  default = "t2.micro"
+}
+
+#instance key pair
+variable "my_instance_keypair" {
+  type    = string
+  default = "my-ec2key-cr"
+}
+
+#enabling monitoring
+variable "monitoring" {
+  type    = bool
+  default = "true"
+}
+
+#network interfaces
+variable "assoc_public_ip" {
+  type    = bool
+  default = "true"
+}
+
+#tag specification resource type
+variable "tag_spec_res_type" {
+  type    = string
+  default = "instance"
+}
+
+#launch template name
+variable "app_launch_template_name" {
+  type    = string
+  default = "aws_launch_template.app.id"
+}
+
+#launch template cpu options
+#core count
+variable "app_cpu_cc" {
+  type    = number
+  default = 1
+}
+#threads per core
+variable "app_cpu_tpc" {
+  type    = number
+  default = 2
+}
+
+
+
+
+## Defining Variables for RDS Database
+
+#Making db subnet group name a variable
+variable "aws_db_subnet_group_default" {
+  description = "my default db subnet group"
+  type        = string
+  default     = "my subnet group"
+}
+
+#DB engine name
+variable "my_engine" {
+  description = "my database engine"
+  type        = string
+  default     = "mysql"
+}
+
+#DB engine version
+variable "my_engine_version" {
+  description = "my database engine version"
+  type        = string
+  default     = "8.0.28"
+}
+
+#DB instance class
+variable "instance_class" {
+  description = "my database instance class"
+  type        = string
+  default     = "db.t2.micro"
+}
+
+
+## Making DB Username, DB Password and My IP address sensitive
 #Making Database username sensitive
 variable "db_username" {
   description = "RDS administrator username"
@@ -71,12 +282,6 @@ variable "db_password" {
   sensitive   = true
 }
 
-#Making Database name a variable
-variable "mydb_name" {
-  description = "RDS database name"
-  type        = string
-  default  = "mysql-database-3tier"
-}
 
 #Making my ip address for SSH access sensitive
 variable "my_ip" {
@@ -85,52 +290,7 @@ variable "my_ip" {
   sensitive   = true
 }
 
-#Making db subnet group name a variable
-variable "aws_db_subnet_group_default" {
-  description = "my default db subnet group"
-  type        = string
-  default     = "my subnet group"
-}
 
 
 
 
-
-#Defining variables and data for load balancer
-variable "lb_arn" {
-  type    = string
-  default = ""
-}
-
-variable "lb_name" {
-  type    = string
-  default = ""
-}
-
-data "aws_lb" "test" {
-  arn  = var.lb_arn
-  name = var.lb_name
-}
-
-
-
-
-#Defining variables and data for load balancer listener
-variable "listener_arn" {
-  type = string
-}
-
-data "aws_lb_listener" "listener" {
-  arn = var.listener_arn
-}
-
-# get listener from load_balancer_arn and port
-
-data "aws_lb" "selected" {
-  name = "default-public"
-}
-
-data "aws_lb_listener" "selected443" {
-  load_balancer_arn = data.aws_lb.selected.arn
-  port              = 443
-}

@@ -1,7 +1,7 @@
 
 #using data source to get available availability zones
 data "aws_availability_zones" "available" {
-    state = "available"
+  state = "available"
 }
 
 # Creating 1st public subnet 
@@ -23,7 +23,7 @@ resource "aws_subnet" "public_subnet_2" {
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.available.names[1]
 
-  tags = { 
+  tags = {
     Name = var.tags[0]
   }
 }
