@@ -267,28 +267,22 @@ variable "instance_class" {
 }
 
 
-## Making DB Username, DB Password and My IP address sensitive
-#Making Database username sensitive
+# Database username 
 variable "db_username" {
   description = "RDS administrator username"
   type        = string
-  sensitive   = true
+  default   = "drayerh"
 }
 
-#Making Database password sensitive
+#Database password 
 variable "db_password" {
   description = "RDS administrator password"
   type        = string
-  sensitive   = true
+  default  = "insecurepassword"
 }
 
 
-#Making my ip address for SSH access sensitive
-variable "my_ip" {
-  description = "my ip address for SSH access"
-  type        = string
-  sensitive   = true
-}
+
 
 
 
